@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Login - MatriCare</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-blue-50 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+        <div class="text-center mb-8">
+            <div
+                class="w-16 h-16 bg-gradient-to-br from-pink-500 to-rose-600 rounded-xl flex items-center justify-center shadow-lg mx-auto mb-4">
+                <i class="fas fa-hand-holding-heart text-white text-3xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-gray-800">Doctor Verification</h1>
+            <p class="text-gray-500 text-sm">Please enter your license number to access the dashboard</p>
+        </div>
+
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label for="doctorId" class="block text-sm font-medium text-gray-700 mb-1">Doctor License</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-id-card text-gray-400"></i>
+                    </div>
+                    <input type="text" id="doctorId" name="doctorId" required
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition"
+                        placeholder="Enter your license number">
+                </div>
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password (License
+                    Number)</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-lock text-gray-400"></i>
+                    </div>
+                    <input type="password" id="password" name="password" required
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition"
+                        placeholder="••••••••">
+                </div>
+            </div>
+
+            <div id="errorMessage" class="hidden text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg">
+                Invalid credentials. Please try again.
+            </div>
+
+            <button type="submit"
+                class="w-full bg-gradient-to-r from-pink-600 to-rose-600 text-white py-3 rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition duration-200">
+                Verify & Login
+            </button>
+        </form>
+
+        <div class="mt-6 text-center space-y-2">
+            <a href="#" class="block text-sm text-pink-600 hover:underline">Forgot credentials?</a>
+            <p class="text-sm text-gray-600">New doctor? <a href="signup.html"
+                    class="text-pink-600 hover:underline font-medium">Register here</a></p>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- Firebase Service -->
+    <script src="js/firebase.service.js"></script>
+
+    <script>
+        // Initialize Firebase
+        console.log('Initializing Firebase...');
+        initializeFirebase();
+        console.log('Firebase initialized');
+
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const doctorLicense = document.getElementById('doctorId').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+
+            console.log('Login attempt with license:', doctorLicense);
+
+            // Show loading state
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Verifying...';
+            submitBtn.disabled = true;
+
+            try {
+                console.log('Querying Firestore for doctor...');
+                // Query Firestore for doctor with matching license
+                const doctor = await FirebaseService.getDoctorByLicense(doctorLicense);
+
+                console.log('Doctor query result:', doctor);
+
+                // Check if doctor exists and password matches either license or licence_number
+                if (doctor && (doctor.license === password || doctor.licence_number === password)) {
+                    console.log('Login successful!');
+                    // Set session data
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    sessionStorage.setItem('doctorName', doctor.name || 'Doctor');
+                    sessionStorage.setItem('doctorPhoto', doctor.photoURL || 'https://ui-avatars.com/api/?name=Doctor');
+                    sessionStorage.setItem('doctorLicense', doctor.license);
+
+                    // Redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                } else {
+                    console.log('Invalid credentials - doctor:', doctor, 'password match:', doctor?.license === password);
+                    // Invalid credentials
+                    errorMessage.classList.remove('hidden');
+                    const form = document.getElementById('loginForm');
+                    form.classList.add('animate-pulse');
+                    setTimeout(() => form.classList.remove('animate-pulse'), 500);
+
+                    // Reset button
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorMessage.textContent = 'Error connecting to server. Please try again.';
+                errorMessage.classList.remove('hidden');
+
+                // Reset button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>
