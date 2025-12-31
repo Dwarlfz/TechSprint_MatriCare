@@ -21,6 +21,10 @@ According to WHO, **800+ maternal deaths occur daily worldwide**, many of which 
 
 ---
 
+Link to the Explanation Videos:
+https://drive.google.com/drive/folders/1jo48ZIeJ_1j3i31wAbvSshFyidk1JFzM?usp=sharing
+
+---
 ## 💡 Proposed Solution
 
 MatriCare offers an **end-to-end maternal monitoring ecosystem** consisting of:
@@ -155,6 +159,7 @@ The MatriCare mobile application is distributed as an **APK file** for easy inst
 ### 🔹 Step 1: Download the APK
 
 1. Open the GitHub repository or shared download link.
+https://drive.google.com/drive/folders/1jo48ZIeJ_1j3i31wAbvSshFyidk1JFzM?usp=sharing
 2. Download the file:
 
    ```
