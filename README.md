@@ -82,7 +82,7 @@ Instant alerts ensure timely intervention and reduce medical emergencies.
 * Emergency notifications
 * AI chatbot for medical insights
 
-Web Application Link : illustrious-sopapillas-dd625e.netlify.app
+Web Application Link : https://illustrious-sopapillas-dd625e.netlify.app/
 
 ---
 
